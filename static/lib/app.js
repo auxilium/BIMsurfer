@@ -1517,6 +1517,7 @@ function BimSurfer() {
 				}
 			}
 		}
+		this.setSelectedObjectId(id);
 	};
 
 	/**
@@ -2507,4 +2508,3 @@ function BimSurfer() {
 		othis.fileImport(othis.propertyValues.autoLoadPath);
 	}
 }
-new BimSurfer();
