@@ -1,7 +1,7 @@
 /*
  * BIMsurfer
  * Copyright 2012, Bimsurfer.org.
- * 
+ *
  * started by L�on van Berlo, BIMserver.org / TNO
  * created by Rehno Lindeque
  * enhanced by Kaltenriner Cristoph, Leichtfried Michael, TU Vienna, 2012
@@ -13,16 +13,16 @@ function BimSurfer() {
 	this.loggingEnabled = true;
 	this.bimServerApi = null;
 	this.mode = "none";
-	this.classNames = [ 
-       "IfcColumn", 
-       "IfcStair", 
-       "IfcSlab", 
-       "IfcWindow", 
-       "IfcDoor", 
-       "IfcBuildingElementProxy", 
-       "IfcWallStandardCase", 
-       "IfcWall", 
-       "IfcBeam", 
+	this.classNames = [
+       "IfcColumn",
+       "IfcStair",
+       "IfcSlab",
+       "IfcWindow",
+       "IfcDoor",
+       "IfcBuildingElementProxy",
+       "IfcWallStandardCase",
+       "IfcWall",
+       "IfcBeam",
        "IfcRailing",
        "IfcProxy",
        "IfcRoof"
@@ -190,7 +190,7 @@ function BimSurfer() {
 		SceneJS.FX.TweenSpline.update();
 		return null;
 	};
-	
+
 	this.lookAtToQuaternion = function(lookAt) {
 		var eye, look, up, x, y, z;
 		eye = recordToVec3(lookAt.eye);
@@ -580,13 +580,13 @@ function BimSurfer() {
 
 	this.mouseMove = function(event) {
 		var delta, deltaLength, orbitAngles, panVector;
-		
+
 		delta = [ event.clientX - othis.viewport.mouse.last[0], event.clientY - othis.viewport.mouse.last[1] ];
-		
+
 		if (delta[0] == 0 && delta[1] == 0) {
 			return; // avoids disappearing
 		}
-		
+
 		// object
 		deltaLength = SceneJS_math_lenVec2(delta);
 		if (othis.viewport.mouse.leftDown) {
@@ -640,7 +640,7 @@ function BimSurfer() {
 
 	/**
 	 * Sets Rotate or Pan mode (called from GWT)
-	 * 
+	 *
 	 * @param _mouseRotate
 	 *            an Integer: 0...Rotate, 1...Pan
 	 */
@@ -738,7 +738,7 @@ function BimSurfer() {
 	/**
 	 * Set camera to view position. Sets predesigned view positions: 0...reset,
 	 * 1...front, 2...side, 3...top
-	 * 
+	 *
 	 * @param view
 	 *            an Integer: 0...reset, 1...front, 2...side, 3...top
 	 */
@@ -865,7 +865,7 @@ function BimSurfer() {
 
 	/**
 	 * Set zoom level.
-	 * 
+	 *
 	 * @param zoomVal
 	 *            an int, -1 for zoom in, 1 for zoom out
 	 */
@@ -877,7 +877,7 @@ function BimSurfer() {
 
 	/**
 	 * Set zoom Level with Absolute Value
-	 * 
+	 *
 	 * @param zoomVal
 	 *            an int in range 0 to 20
 	 */
@@ -900,7 +900,7 @@ function BimSurfer() {
 	// set Warning is called from an extern Applicatin (GWT)
 	/**
 	 * Marks all Objects from an Array.
-	 * 
+	 *
 	 * @param names
 	 *            a String Array with all Objects to Highlight
 	 */
@@ -929,7 +929,7 @@ function BimSurfer() {
 
 	/**
 	 * Translates Object Name into ID
-	 * 
+	 *
 	 * @param objName
 	 *            a String with the name of an Object
 	 * @returns doSetViewToObject a Function to do the setView to Object Action
@@ -943,7 +943,7 @@ function BimSurfer() {
 	 * Generates two snapshots and starts camera movement. First snapshot is
 	 * generated on actual position. For the second snapshot a good View to the
 	 * Objects is calculated.
-	 * 
+	 *
 	 * @param objID
 	 *            a String with the ID of an Object
 	 */
@@ -1047,7 +1047,7 @@ function BimSurfer() {
 
 	/**
 	 * Method for setting the corresponding transparent level adjusted in GWT.
-	 * 
+	 *
 	 * @param factor
 	 *            the transparency factor (0 - 100)
 	 */
@@ -1080,10 +1080,10 @@ function BimSurfer() {
 			othis.setAllWallsTransparent(factor);
 		}
 	};
-	
-	
+
+
 	this.setAllWallsTransparent = function(factor) {
-	
+
 		var sceneData = othis.scene.data();
 		var index = sceneData.ifcTypes.indexOf('WallStandardCase');
 		var wallCase = sceneData.ifcTypes[index];
@@ -1093,7 +1093,7 @@ function BimSurfer() {
 		var roofIndex = sceneData.ifcTypes.indexOf('Roof');
 		var roof = sceneData.ifcTypes[roofIndex];
 		var roofNode;
-		
+
 		if(roof != null) {
 			roofNode = othis.scene.findNode(roof.toLowerCase());
 		}
@@ -1119,7 +1119,7 @@ function BimSurfer() {
 
 	/**
 	 * Method to insert transparent material nodes.
-	 * 
+	 *
 	 * @param currentNode
 	 *            the node where the transparency material should be inserted
 	 * @param factor
@@ -1166,7 +1166,7 @@ function BimSurfer() {
 
 	/**
 	 * Method for setting the corresponding expose level adjusted in GWT.
-	 * 
+	 *
 	 * @param factor
 	 *            the expose factor (0 - 150)
 	 */
@@ -1193,7 +1193,7 @@ function BimSurfer() {
 
 	/**
 	 * Method for exposing a particular Building Storey.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent node of the storey which should be exposed
 	 * @param distance
@@ -1275,7 +1275,7 @@ function BimSurfer() {
 			//GWT: window.callbackExposeLevel(0);
 		}
 	};
-	
+
 	/**
 	   * Sets the transparent slider according to the transparent level of the selected element
 	   */
@@ -1294,7 +1294,7 @@ function BimSurfer() {
 			  }
 		  }
 	  };
-	  
+
 	  /**
 	   * Sets the Zoom Slider according to the Zoomlevel
 	   */
@@ -1323,7 +1323,7 @@ function BimSurfer() {
 	/**
 	 * Searches for all objects with the specified name or pattern and
 	 * highlights them.
-	 * 
+	 *
 	 * @param pattern
 	 *            the name or pattern of the elements to be selected
 	 */
@@ -1680,7 +1680,7 @@ function BimSurfer() {
 	/**
 	 * Calculates the Eye Position and the Look Position to get a View to the
 	 * Point of interest
-	 * 
+	 *
 	 * @param x
 	 *            an Integer with the x Value of the first Vertex of an Object
 	 * @param y
@@ -1767,7 +1767,7 @@ function BimSurfer() {
 		return (SceneJS.FX.TweenSpline(othis.scene.findNode('main-lookAt'))).sequence(othis.snapshots.lookAts);
 	};
 
-	// http://stackoverflow.com/questions/1885557/simplest-code-for-array-intersection-in-javascript	
+	// http://stackoverflow.com/questions/1885557/simplest-code-for-array-intersection-in-javascript
 	this.intersect_safe = function(a, b)
 	{
 	  var ai=0, bi=0;
@@ -1786,7 +1786,7 @@ function BimSurfer() {
 	  }
 	  return result;
 	}
-	
+
 	this.progressHandler = function(topicId, state) {
 		if (state.state == "FINISHED") {
 			othis.bimServerApi.unregisterProgressHandler(othis.currentAction.laid, othis.progressHandler);
@@ -1810,7 +1810,7 @@ function BimSurfer() {
 					othis.typeDownloadQueue.sort();
 					data.data.ifcTypes.sort();
 					othis.typeDownloadQueue = othis.intersect_safe(othis.typeDownloadQueue, data.data.ifcTypes);
-					
+
 					othis.loadGeometry(othis.currentAction.roid, serializer.oid);
 				});
 			});
@@ -2050,7 +2050,7 @@ function BimSurfer() {
 			othis.bimserverImportDialogShowTab1();
 		});
 	};
-	
+
 	this.bimserverImportDialogLogin = function() {
 		var pwd, url, user, valid;
 		othis.bimserverImportDialogClearMessages();
@@ -2169,7 +2169,7 @@ function BimSurfer() {
 			return void 0;
 		}
 	};
-	
+
 	//window.fileImport = function(file) {		//use this for call from GWT
 	this.fileImport = function(file) {
 		var ret = $.getJSON(file, function(json) {
@@ -2448,7 +2448,7 @@ function BimSurfer() {
 
 				// highlight all elements with specified name
 				othis.highlightElements("dp_");
-				
+
 				// set ZoomSlider to middle
 				othis.setZoomSlider(75);
 				return othis.scene;
@@ -2460,7 +2460,7 @@ function BimSurfer() {
 		othis.helpShortcuts('standard');
 		return null;
 	};
-	
+
 	othis.queryArgs = othis.parseQueryArguments();
 	othis.canvasInit();
 	othis.viewportInit();
@@ -2475,7 +2475,7 @@ function BimSurfer() {
 	othis.registerDOMEvents();
 	othis.registerControlEvents();
 	othis.application.initialized = true;
-	
+
 	if (othis.queryArgs.token != null) {
 		var timeoutId; // timeout id is a global variable
 		timeoutId = window.setTimeout(function() {
@@ -2488,17 +2488,17 @@ function BimSurfer() {
 			othis.loadBimServerModelNew(othis.queryArgs.roid);
 		});
 	}
-	
+
 	if ((othis.queryArgs.model != null) && othis.queryArgs.format === 'scenejson') {
 		return othis.initLoadModel(othis.queryArgs.model);
 	}
-	
+
 	//Hardcoded Path for autoload
 	//othis.propertyValues.autoLoadPath = "models/Haus.json";
-	
+
 	//start Autoload-Action from GWT
 	//GWT: window.callbackImportObject();
-	
+
 	//if there is a string set, load Model
 	if (othis.propertyValues.autoLoadPath == ""){
 		console.log("No Model for Autoload");
