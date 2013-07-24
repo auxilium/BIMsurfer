@@ -1409,15 +1409,17 @@ function BimSurfer() {
 		}
 		tableItemObject = function(keyStack, key, value) {
 			var html, k, _j, _len2;
-			html = "<a class='ifc-link' href='#";
-			if ((value.link != null) && typeof value.link === 'number') {
-				return html += value.link + ("'>" + value.link + "</a>");
-			} else {
-				for (_j = 0, _len2 = keyStack.length; _j < _len2; _j++) {
-					k = keyStack[_j];
-					html += k + "/";
+			if (value != null) {
+				html = "<a class='ifc-link' href='#";
+				if ((value.link != null) && typeof value.link === 'number') {
+					return html += value.link + ("'>" + value.link + "</a>");
+				} else {
+					for (_j = 0, _len2 = keyStack.length; _j < _len2; _j++) {
+						k = keyStack[_j];
+						html += k + "/";
+					}
+					return html += key + "'>...</a>";
 				}
-				return html += key + "'>...</a>";
 			}
 		};
 
@@ -1633,12 +1635,14 @@ function BimSurfer() {
 				el = elements[_i];
 				if (othis.constants.loadingType.loadFromBimserver == 1){
 					if (othis.loadedTypes.indexOf($(el).attr("className")) == -1) {
-						othis.typeDownloadQueue = [ $(el).attr("className") ];
-						othis.bimServerApi.call("PluginInterface", "getSerializerByPluginClassName", {
-							pluginClassName : "org.bimserver.geometry.json.JsonGeometrySerializerPlugin"
-						}, function(serializer) {
-							othis.loadGeometry(othis.currentAction.roid, serializer.oid);
-						});
+						othis.typeDownloadQueue.push($(el).attr("className"));
+						if (othis.mode != "loading" && othis.mode != "processing") {
+							othis.bimServerApi.call("PluginInterface", "getSerializerByPluginClassName", {
+								pluginClassName : "org.bimserver.geometry.json.JsonGeometrySerializerPlugin"
+							}, function(serializer) {
+								othis.loadGeometry(othis.currentAction.roid, serializer.oid);
+							});
+						}							
 					}
 				}
 				_results.push(((($(el)).attr('id')).split(/^layer\-/))[1]);
@@ -1830,17 +1834,12 @@ function BimSurfer() {
 		othis.bimServerApi.call("PluginInterface", "getSerializerByPluginClassName", {
 			pluginClassName : "org.bimserver.geometry.jsonshell.SceneJsShellSerializerPlugin"
 		}, function(serializer) {
-			othis.bimServerApi.call("ServiceInterface", "download", {
+			othis.bimServerApi.call("Bimsie1ServiceInterface", "download", {
 				roid : roid,
 				serializerOid : serializer.oid,
 				showOwn : true,
 				sync : false
 			}, function(laid) {
-				othis.bimServerApi.registerProgressHandler(laid, othis.progressHandler, function(){
-					othis.bimServerApi.call("RegistryInterface", "getProgress", {topicId: laid}, function(state){
-						othis.progressHandler(null, state);
-					});
-				});
 				$(".loadingdiv").hide();
 				$(".loadingdiv .text").html("Loading BIM model");
 				$(".loadingdiv .progress").remove();
@@ -1849,6 +1848,8 @@ function BimSurfer() {
 				othis.currentAction.serializerOid = serializer.oid;
 				othis.currentAction.laid = laid;
 				othis.currentAction.roid = roid;
+				othis.bimServerApi.registerProgressHandler(laid, othis.progressHandler, function(){
+				});
 			});
 		});
 	};
@@ -1921,18 +1922,14 @@ function BimSurfer() {
 							});
 						}
 					}
-					if (geometry.material == "IfcWindow") {
-						var flags = {
-							type : "flags",
-							flags : {
-								transparent : true
-							},
-							nodes : [ material ]
-						};
-						typeNode.nodes.push(flags);
-					} else {
-						typeNode.nodes.push(material);
-					}
+					var flags = {
+						type : "flags",
+						flags : {
+							transparent : true
+						},
+						nodes : [ material ]
+					};
+					typeNode.nodes.push(flags);
 				});
 				othis.scene.findNode("main-renderer").add("node", typeNode);
 				$("#layer-" + othis.currentAction.className.toLowerCase()).attr("checked", "checked");
@@ -1942,16 +1939,17 @@ function BimSurfer() {
 
 	this.loadGeometry = function(roid, serializerOid) {
 		if (othis.typeDownloadQueue.length == 0) {
+			othis.mode = "done";
 			$(".loadingdiv").fadeOut(800);
 			return;
 		}
 		var className = othis.typeDownloadQueue[0];
+		othis.typeDownloadQueue = othis.typeDownloadQueue.slice(1);
 		$(".loadingdiv .text").html("Loading " + className);
 		$(".loadingdiv .progress").remove();
 		$(".loadingdiv").append("<div class=\"progress\"><div class=\"bar\" style=\"width: 0%\"></div></div>");
 		$(".loadingdiv").show();
-		othis.typeDownloadQueue = othis.typeDownloadQueue.slice(1);
-		othis.bimServerApi.call("ServiceInterface", "downloadByTypes", {
+		othis.bimServerApi.call("Bimsie1ServiceInterface", "downloadByTypes", {
 			roids : [ roid ],
 			classNames : [ className ],
 			serializerOid : serializerOid,
@@ -1961,15 +1959,12 @@ function BimSurfer() {
 			deep: true
 		}, function(laid) {
 			othis.mode = "loading";
-			othis.bimServerApi.registerProgressHandler(laid, othis.progressHandlerType, function(){
-				othis.bimServerApi.call("RegistryInterface", "getProgress", {topicId: laid}, function(state){
-					othis.progressHandlerType(null, state);
-				});
-			});
 			othis.currentAction.serializerOid = serializerOid;
 			othis.currentAction.laid = laid;
 			othis.currentAction.roid = roid;
 			othis.currentAction.className = className;
+			othis.bimServerApi.registerProgressHandler(laid, othis.progressHandlerType, function(){
+			});
 		});
 	};
 
@@ -2107,8 +2102,9 @@ function BimSurfer() {
 		$projectList = $('#bimserver-projects');
 		$projectList.html("");
 
-		othis.bimServerApi.call("ServiceInterface", "getAllProjects", {
-			onlyTopLevel : true
+		othis.bimServerApi.call("Bimsie1ServiceInterface", "getAllProjects", {
+			onlyTopLevel : true,
+			onlyActive: true
 		}, function(data) {
 			($('#bimserver-import-message-info')).html("Fetched all projects");
 			data.forEach(function(project) {
